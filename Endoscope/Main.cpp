@@ -339,140 +339,90 @@ int run_stream(){
 		if (frame_counter>5){
 			//calculate_optical_flow(prev, image);
 
-			//ORB Feature extraction and matching
-			orb_result orb_descriptors_current = extract_orb(image);
-			orb_result orb_descriptors_previous = extract_orb(prev);
-			Ptr<cuda::DescriptorMatcher> matcher_object = cuda::DescriptorMatcher::createBFMatcher(NORM_HAMMING);
-			vector< vector< DMatch> > matches;
-			matcher_object->knnMatch(orb_descriptors_previous.descriptors, orb_descriptors_current.descriptors, matches, 2);
-			std::vector< DMatch > good_matches;
-			for (int k = 0; k < min(orb_descriptors_previous.descriptors.rows - 1, (int)matches.size()); k++)
-			{
-				if ((matches[k][0].distance < 0.7*(matches[k][1].distance)) && ((int)matches[k].size() <= 2 && (int)matches[k].size()>0))
-				{
-					good_matches.push_back(matches[k][0]);
-				}
-			}
-			Mat img_matches;
-			cv::drawMatches(prev, orb_descriptors_previous.keypoints, image, orb_descriptors_current.keypoints, good_matches, img_matches);
-			cv::imshow("Matching keypoints", img_matches);
-			
-			//int point_count = 100;
-			vector<Point2d> points1;
-			vector<Point2d> points2;
-			//vector<Point3d> triangulated_points;
-			//cout << good_matches.size() << endl;
-			for (unsigned int i = 0; i<good_matches.size(); i++)
-			{
-				points1.push_back(orb_descriptors_previous.keypoints[good_matches[i].trainIdx].pt);
-			    points2.push_back(orb_descriptors_current.keypoints[good_matches[i].queryIdx].pt);
-			}
-
-			//for (int i = 0; i < point_count; i++)
+			////ORB Feature extraction and matching
+			//orb_result orb_descriptors_current = extract_orb(image);
+			//orb_result orb_descriptors_previous = extract_orb(prev);
+			//Ptr<cuda::DescriptorMatcher> matcher_object = cuda::DescriptorMatcher::createBFMatcher(NORM_HAMMING);
+			//vector< vector< DMatch> > matches;
+			//matcher_object->knnMatch(orb_descriptors_previous.descriptors, orb_descriptors_current.descriptors, matches, 2);
+			//std::vector< DMatch > good_matches;
+			//for (int k = 0; k < min(orb_descriptors_previous.descriptors.rows - 1, (int)matches.size()); k++)
 			//{
-			//	points1[i] = orb_descriptors_previous.keypoints.at(i).pt;
-			//	points2[i] = orb_descriptors_current.keypoints.at(i).pt;
-			//	
+			//	if ((matches[k][0].distance < 0.7*(matches[k][1].distance)) && ((int)matches[k].size() <= 2 && (int)matches[k].size()>0))
+			//	{
+			//		good_matches.push_back(matches[k][0]);
+			//	}
+			//}
+			//Mat img_matches;
+			//cv::drawMatches(prev, orb_descriptors_previous.keypoints, image, orb_descriptors_current.keypoints, good_matches, img_matches);
+			//cv::imshow("Matching keypoints", img_matches);
+			//vector<Point2d> points1;
+			//vector<Point2d> points2;
+			//for (unsigned int i = 0; i<good_matches.size(); i++)
+			//{
+			//	points1.push_back(orb_descriptors_previous.keypoints[good_matches[i].trainIdx].pt);
+			//    points2.push_back(orb_descriptors_current.keypoints[good_matches[i].queryIdx].pt);
+			//}
+			//if (good_matches.size() > 0){
+			//	Mat mask;
+			//	Mat fundamental_matrix = Mat(Size(3, 3), CV_64F, float(0));
+			//	fundamental_matrix = cv::findFundamentalMat(points1, points2, FM_RANSAC, 3, 0.99, mask);
+			//	if (!fundamental_matrix.empty() && fundamental_matrix.cols == K.rows && fundamental_matrix.rows == K.cols){
+			//		Mat E = K.t() * fundamental_matrix * K;
+			//		SVD svd(E);
+			//		Matx33d W(0, -1, 0, 1, 0, 0, 0, 0, 1);
+			//		Matx33d Winv(0, 1, 0, -1, 0, 0, 0, 0, 1);
+			//		Mat R = svd.u * Mat(W) * svd.vt;
+			//		Mat t = svd.u.col(2);
+			//		double P00 = R.at<double>(Point(0, 0));
+			//		double P01 = R.at<double>(Point(0, 1));
+			//		double P02 = R.at<double>(Point(0, 2));
+			//		double P03 = t.at<double>(0);
+			//		double P04 = R.at<double>(Point(1, 0));
+			//		double P05 = R.at<double>(Point(1, 1));
+			//		double P06 = R.at<double>(Point(1, 2));
+			//		double P07 = t.at<double>(1);
+			//		double P08 = R.at<double>(Point(2, 0));
+			//		double P09 = R.at<double>(Point(2, 1));
+			//		double P10 = R.at<double>(Point(2, 2));
+			//		double P11 = t.at<double>(2);
+			//		double data [12] = { P00, P01, P02, P03, P04, P05, P06, P07, P08, P09, P10, P11 };
+			//		Mat RT = Mat(3, 4, CV_64FC1, &data);
+			//		Mat P = Mat(3, 4, CV_64FC1);
+			//		if (!RT.empty() && RT.cols == K.rows && RT.rows == K.cols){
+			//			P = K * RT;
+			//		}
+			//		int N = (int)good_matches.size();
+			//		Mat pnts3D(1, N, CV_64FC4);
+			//		Mat cam0pnts(1, N, CV_64FC2);
+			//		Mat cam1pnts(1, N, CV_64FC2);
+			//		cv::triangulatePoints(P, P, cam0pnts, cam1pnts, pnts3D);
+			//		for (int y = 0; y < pnts3D.rows; y++)
+			//		{
+			//			for (int x = 0; x < pnts3D.cols; x++)
+			//			{
+			//			}
+			//		}
+			//	}
 			//}
 
-			if (good_matches.size() > 0){
-				Mat mask;
-				Mat fundamental_matrix = Mat(Size(3, 3), CV_64F, float(0));
-				fundamental_matrix = cv::findFundamentalMat(points1, points2, FM_RANSAC, 3, 0.99, mask);
-				if (!fundamental_matrix.empty() && fundamental_matrix.cols == K.rows && fundamental_matrix.rows == K.cols){
-					Mat E = K.t() * fundamental_matrix * K;
-					SVD svd(E);
-					Matx33d W(0, -1, 0, 1, 0, 0, 0, 0, 1);
-					Matx33d Winv(0, 1, 0, -1, 0, 0, 0, 0, 1);
-					Mat R = svd.u * Mat(W) * svd.vt;
-					Mat t = svd.u.col(2);
+		
 
-					double P00 = R.at<double>(Point(0, 0));
-					double P01 = R.at<double>(Point(0, 1));
-					double P02 = R.at<double>(Point(0, 2));
-					double P03 = t.at<double>(0);
-
-					double P04 = R.at<double>(Point(1, 0));
-					double P05 = R.at<double>(Point(1, 1));
-					double P06 = R.at<double>(Point(1, 2));
-					double P07 = t.at<double>(1);
-
-					double P08 = R.at<double>(Point(2, 0));
-					double P09 = R.at<double>(Point(2, 1));
-					double P10 = R.at<double>(Point(2, 2));
-					double P11 = t.at<double>(2);
-
-					double data [12] = { P00, P01, P02, P03, P04, P05, P06, P07, P08, P09, P10, P11 };
-
-					Mat RT = Mat(3, 4, CV_64FC1, &data);
-
-					if (!RT.empty() && RT.cols == K.rows && RT.rows == K.cols){
-
-						
-
-	/*					try
-						{
-							Mat P = K * RT;
-						}
-						catch (cv::Exception& e)
-						{
-							const char* err_msg = e.what();
-							std::cout << "exception caught: " << err_msg << std::endl;
-						}*/
-					}
-
-					
-
-					//projections.push_back(P);
-					
-					//if (frame_counter>frame_counter+1){
-
-						int N = (int)good_matches.size();
-						
-						cv::Mat pnts3D;
-						//cv::Mat cam0pnts(1, N, CV_64FC2);
-						//cv::Mat cam1pnts(1, N, CV_64FC2);
-					//cv::Mat pnts3D(1, N, CV_64FC4);
-					//cv::Mat cam0pnts(1, N, CV_64FC2);
-					//cv::Mat cam1pnts(1, N, CV_64FC2);
-					//cv::triangulatePoints(P, P, points1, points2, pnts3D);
-
-					//for (int y = 0; y < pnts3D.rows; y++)
-					//{
-						//for (int x = 0; x < pnts3D.cols; x++)
-						//{
-							//Vec4d point = pnts3D.at<Vec4d>(Point(x, y));
-							//cout << "X: " << point.val[0] << "  Y: " << point.val[1] << "  Z: " << point.val[2] << endl;
-							//cout << pnts3D.at<Vec4f>(Point(x, y))[0] << endl;
-							//cout << pnts3D.at<Vec4f>(Point(x, y))[1] << endl;
-							//cout << pnts3D.at<Vec4f>(Point(x, y))[2] << endl;
-							//cout << pnts3D.at<Vec4f>(Point(x, y))[3] << endl;
-						//}
-					//}
-
-
-				}
+			//-- Stereo Matching
+			Mat imgDisparity16S = Mat(prev.rows, prev.cols, CV_16S);
+			Mat imgDisparity8U = Mat(prev.rows, prev.cols, CV_8UC1);
+			if (image.empty() || image.empty())
+			{
+				std::cout << " --(!) Error reading images " << std::endl; return -1;
 			}
-
-			
-
-			//Mat E = K.t() * fundamental_matrix * K;
-
-			////-- Stereo Matching
-			//Mat imgDisparity16S = Mat(prev.rows, prev.cols, CV_16S);
-			//Mat imgDisparity8U = Mat(prev.rows, prev.cols, CV_8UC1);
-			//if (image.empty() || image.empty())
-			//{
-			//	std::cout << " --(!) Error reading images " << std::endl; return -1;
-			//}
-			//int ndisparities = 16 * 5;
-			//int SADWindowSize = 21;
-			//Ptr<cv::StereoBM> sbm = cv::StereoBM::create(ndisparities, SADWindowSize);
-			//sbm->compute(prev, image, imgDisparity16S);
-			//double minVal; double maxVal;
-			//minMaxLoc(imgDisparity16S, &minVal, &maxVal);
-			//imgDisparity16S.convertTo(imgDisparity8U, CV_8UC1, 255 / (maxVal - minVal));
-			//imshow("Disparity Image", imgDisparity8U);
+			int ndisparities = 16 * 5;
+			int SADWindowSize = 21;
+			Ptr<cv::StereoBM> sbm = cv::StereoBM::create(ndisparities, SADWindowSize);
+			sbm->compute(prev, image, imgDisparity16S);
+			double minVal; double maxVal;
+			minMaxLoc(imgDisparity16S, &minVal, &maxVal);
+			imgDisparity16S.convertTo(imgDisparity8U, CV_8UC1, 255 / (maxVal - minVal));
+			imshow("Disparity Image", imgDisparity8U);
 
 		}
 		image.copyTo(prev);
